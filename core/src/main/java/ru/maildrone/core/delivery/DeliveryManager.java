@@ -161,25 +161,27 @@ public final class DeliveryManager {
         drone.spinStep((int) ANIM_PERIOD);
 
         Location pos;
-        if (now < flight.leg1End) {
-            double f = fraction(flight.departure, flight.leg1End, now);
-            pos = lerp(flight.p0, flight.pmid, f);
-        } else if (flight.sorting && now < flight.hoverEnd) {
-            pos = flight.pmid;
-            if (!flight.sortingAnnounced) {
-                flight.sortingAnnounced = true;
-                setStatus(flight.parcel, ParcelStatus.AT_SORTING, config.randomSortingNote());
+        FlightMath.Phase phase = FlightMath.phaseAt(now, flight.leg1End, flight.hoverEnd, flight.arrival, flight.sorting);
+        switch (phase) {
+            case LEG1 -> pos = lerp(flight.p0, flight.pmid, FlightMath.fraction(flight.departure, flight.leg1End, now));
+            case HOVER -> {
+                pos = flight.pmid;
+                if (!flight.sortingAnnounced) {
+                    flight.sortingAnnounced = true;
+                    setStatus(flight.parcel, ParcelStatus.AT_SORTING, config.randomSortingNote());
+                }
             }
-        } else if (now < flight.arrival) {
-            if (flight.parcel.status() != ParcelStatus.IN_TRANSIT) {
-                setStatus(flight.parcel, ParcelStatus.IN_TRANSIT, "");
+            case LEG2 -> {
+                if (flight.parcel.status() != ParcelStatus.IN_TRANSIT) {
+                    setStatus(flight.parcel, ParcelStatus.IN_TRANSIT, "");
+                }
+                long leg2Start = flight.sorting ? flight.hoverEnd : flight.leg1End;
+                pos = lerp(flight.pmid, flight.pdest, FlightMath.fraction(leg2Start, flight.arrival, now));
             }
-            long leg2Start = flight.sorting ? flight.hoverEnd : flight.leg1End;
-            double f = fraction(leg2Start, flight.arrival, now);
-            pos = lerp(flight.pmid, flight.pdest, f);
-        } else {
-            arrive(flight, self);
-            return;
+            default -> {
+                arrive(flight, self);
+                return;
+            }
         }
 
         if (config.faceTravel() && flight.prevPos != null) {
@@ -335,14 +337,6 @@ public final class DeliveryManager {
             t = TrackingNumbers.generate();
         } while (store.exists(t));
         return t;
-    }
-
-    private static double fraction(long start, long end, long now) {
-        if (end <= start) {
-            return 1.0;
-        }
-        double f = (double) (now - start) / (double) (end - start);
-        return Math.max(0.0, Math.min(1.0, f));
     }
 
     private static Location lerp(Location a, Location b, double f) {
