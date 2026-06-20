@@ -58,3 +58,12 @@ storage:
 
 # Сообщать игроку при входе, если в почтомате есть посылки.
 notify-on-join: true
+
+# Проверять новую версию плагина при запуске (GitHub-релизы denfry/MailDrone).
+update-check: true
+
+# Анонимная статистика bStats. Зарегистрируйте плагин на https://bstats.org
+# и впишите полученный id (0 — выключено).
+metrics:
+  enabled: true
+  plugin-id: 0

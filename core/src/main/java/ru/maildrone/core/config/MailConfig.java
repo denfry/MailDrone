@@ -50,6 +50,7 @@ public final class MailConfig {
     private boolean sounds;
 
     private boolean notifyOnJoin;
+    private boolean updateCheck;
     private int deliveredRetentionDays;
     private List<String> sortingNotes;
 
@@ -91,6 +92,7 @@ public final class MailConfig {
         sounds = c.getBoolean("drone.sounds", true);
 
         notifyOnJoin = c.getBoolean("notify-on-join", true);
+        updateCheck = c.getBoolean("update-check", true);
         deliveredRetentionDays = Math.max(0, c.getInt("storage.delivered-retention-days", 7));
         sortingNotes = c.getStringList("delivery.sorting-notes");
         if (sortingNotes.isEmpty()) {
@@ -210,6 +212,10 @@ public final class MailConfig {
 
     public boolean notifyOnJoin() {
         return notifyOnJoin;
+    }
+
+    public boolean updateCheck() {
+        return updateCheck;
     }
 
     public int deliveredRetentionDays() {

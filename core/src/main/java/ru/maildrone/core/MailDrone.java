@@ -24,6 +24,7 @@ import ru.maildrone.core.parcel.Parcel;
 import ru.maildrone.core.scheduler.Schedulers;
 import ru.maildrone.core.storage.ParcelStore;
 import ru.maildrone.core.storage.YamlParcelStore;
+import ru.maildrone.core.util.UpdateChecker;
 
 import java.util.List;
 import java.util.UUID;
@@ -86,6 +87,10 @@ public final class MailDrone {
         }
 
         delivery.resumeAll();
+
+        if (config.updateCheck()) {
+            new UpdateChecker(plugin, schedulers, "denfry/MailDrone").check();
+        }
 
         plugin.getLogger().info("MailDrone включён. Адаптер: " + adapter.name()
                 + (schedulers.isFolia() ? ", режим Folia" : ", режим Paper"));

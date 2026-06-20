@@ -17,6 +17,15 @@ public final class MailDronePlugin extends JavaPlugin {
         PlatformAdapter adapter = AdapterFactory.create(this);
         mailDrone = new MailDrone(this, adapter);
         mailDrone.enable();
+        setupMetrics();
+    }
+
+    private void setupMetrics() {
+        int id = getConfig().getInt("metrics.plugin-id", 0);
+        if (getConfig().getBoolean("metrics.enabled", true) && id > 0) {
+            new org.bstats.bukkit.Metrics(this, id);
+            getLogger().info("bStats-метрика включена (id " + id + ")");
+        }
     }
 
     @Override
