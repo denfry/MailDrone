@@ -94,9 +94,11 @@ public final class Messages {
         m.put("cost-free", "бесплатно");
         m.put("cost-xp", "<amount> ур. опыта");
         m.put("cost-item", "<amount> × <item>");
+        m.put("cost-money", "<amount> монет");
 
         m.put("cannot-afford-xp", "<red>Недостаточно опыта: нужно <white><amount></white> ур.");
         m.put("cannot-afford-item", "<red>Недостаточно предметов: нужно <white><amount> × <item></white>.");
+        m.put("cannot-afford-money", "<red>Недостаточно средств: нужно <white><amount> монет</white>.");
 
         m.put("sent", "<green>Посылка принята! Трек-номер: <white><tracking></white>");
         m.put("drone-departed", "<gray>Дрон вылетел с отделения <white><origin></white>.");

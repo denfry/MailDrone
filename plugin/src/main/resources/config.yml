@@ -26,7 +26,7 @@ delivery:
     - "Временно задержана: перегрузка сортировочного узла"
 
 cost:
-  # Способ оплаты: NONE | XP_LEVELS | ITEM
+  # Способ оплаты: NONE | XP_LEVELS | ITEM | VAULT (деньги; нужен Vault + эконом-плагин)
   type: XP_LEVELS
   amount: 1
   # Используется при type: ITEM

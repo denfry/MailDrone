@@ -2,6 +2,7 @@ package ru.maildrone.core.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -228,6 +229,12 @@ public final class PostCommand implements CommandExecutor, TabCompleter {
                 List<String> names = new ArrayList<>();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     names.add(p.getName());
+                }
+                for (OfflinePlayer off : Bukkit.getOfflinePlayers()) {
+                    String n = off.getName();
+                    if (n != null && !names.contains(n)) {
+                        names.add(n);
+                    }
                 }
                 return filter(names, args[1]);
             }

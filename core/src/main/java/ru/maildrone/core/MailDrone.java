@@ -14,6 +14,7 @@ import ru.maildrone.core.config.Messages;
 import ru.maildrone.core.delivery.CostService;
 import ru.maildrone.core.delivery.DeliveryManager;
 import ru.maildrone.core.delivery.NotificationService;
+import ru.maildrone.core.economy.VaultEconomy;
 import ru.maildrone.core.gui.AnvilNamePrompt;
 import ru.maildrone.core.gui.MailboxMenu;
 import ru.maildrone.core.gui.PackingMenu;
@@ -69,7 +70,7 @@ public final class MailDrone {
         postPoints = new PostPointManager(plugin, schedulers);
         postPoints.load();
 
-        cost = new CostService(config, messages);
+        cost = new CostService(config, messages, new VaultEconomy());
         notifications = new NotificationService(messages, config, schedulers, store);
         delivery = new DeliveryManager(config, messages, schedulers, store, adapter, notifications, postPoints);
 
