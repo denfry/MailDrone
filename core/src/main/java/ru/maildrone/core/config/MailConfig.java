@@ -47,6 +47,7 @@ public final class MailConfig {
     private boolean sounds;
 
     private boolean notifyOnJoin;
+    private int deliveredRetentionDays;
     private List<String> sortingNotes;
 
     public MailConfig(JavaPlugin plugin) {
@@ -84,6 +85,7 @@ public final class MailConfig {
         sounds = c.getBoolean("drone.sounds", true);
 
         notifyOnJoin = c.getBoolean("notify-on-join", true);
+        deliveredRetentionDays = Math.max(0, c.getInt("storage.delivered-retention-days", 7));
         sortingNotes = c.getStringList("delivery.sorting-notes");
         if (sortingNotes.isEmpty()) {
             sortingNotes = List.of(
@@ -190,6 +192,10 @@ public final class MailConfig {
 
     public boolean notifyOnJoin() {
         return notifyOnJoin;
+    }
+
+    public int deliveredRetentionDays() {
+        return deliveredRetentionDays;
     }
 
     // ---- helpers ----

@@ -22,3 +22,10 @@ permissions:
   maildrone.admin:
     description: Администрирование почты (отделения, почтоматы, reload)
     default: op
+  maildrone.*:
+    description: Все права плагина MailDrone
+    default: op
+    children:
+      maildrone.use: true
+      maildrone.send: true
+      maildrone.admin: true

@@ -158,6 +158,22 @@ public final class YamlParcelStore implements ParcelStore {
         writeFile(buildYaml());
     }
 
+    @Override
+    public void purgeTerminalBefore(long cutoffMillis) {
+        int removed = 0;
+        for (Parcel p : parcels.values()) {
+            if (p.status().isTerminal() && p.updatedAt() < cutoffMillis) {
+                parcels.remove(p.tracking());
+                contentCache.remove(p.tracking());
+                removed++;
+            }
+        }
+        if (removed > 0) {
+            plugin.getLogger().info("Удалено старых посылок: " + removed);
+            scheduleSave();
+        }
+    }
+
     // ---- internals ----
 
     private void scheduleSave() {

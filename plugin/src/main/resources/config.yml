@@ -49,5 +49,9 @@ drone:
   particles: true
   sounds: true
 
+storage:
+  # Сколько дней хранить вручённые/возвращённые посылки перед удалением (0 — хранить всегда).
+  delivered-retention-days: 7
+
 # Сообщать игроку при входе, если в почтомате есть посылки.
 notify-on-join: true

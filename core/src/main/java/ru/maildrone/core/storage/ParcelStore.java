@@ -45,4 +45,7 @@ public interface ParcelStore {
 
     /** Принудительно сохраняет всё синхронно (вызывать при выключении). */
     void flush();
+
+    /** Удаляет терминальные посылки (вручённые/возвращённые) старше указанного момента. */
+    void purgeTerminalBefore(long cutoffMillis);
 }

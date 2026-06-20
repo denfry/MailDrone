@@ -58,6 +58,10 @@ public final class MailDrone {
 
         store = new YamlParcelStore(plugin, schedulers);
         store.load();
+        int retentionDays = config.deliveredRetentionDays();
+        if (retentionDays > 0) {
+            store.purgeTerminalBefore(System.currentTimeMillis() - retentionDays * 86_400_000L);
+        }
 
         postPoints = new PostPointManager(plugin, schedulers);
         postPoints.load();
