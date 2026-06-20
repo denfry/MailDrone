@@ -113,7 +113,8 @@ public final class DeliveryManager {
                 (p0.getX() + pdest.getX()) / 2.0, cruiseY, (p0.getZ() + pdest.getZ()) / 2.0);
 
         DroneEntity drone = new DroneEntity();
-        drone.spawn(p0, config.bodyMaterial(), config.rotorMaterial(), config.droneScale());
+        drone.spawn(p0, config.bodyMaterial(), config.rotorMaterial(), config.noseMaterial(),
+                config.droneScale(), config.rotorCount());
         if (!drone.isSpawned() || drone.body() == null) {
             arriveLogical(parcel);
             return;
@@ -181,7 +182,15 @@ public final class DeliveryManager {
             return;
         }
 
-        drone.moveTo(pos, (int) ANIM_PERIOD);
+        if (config.faceTravel() && flight.prevPos != null) {
+            double dx = pos.getX() - flight.prevPos.getX();
+            double dz = pos.getZ() - flight.prevPos.getZ();
+            if (dx * dx + dz * dz > 1.0e-6) {
+                flight.yaw = Math.atan2(dx, dz);
+            }
+        }
+        flight.prevPos = pos;
+        drone.moveTo(pos, config.faceTravel() ? flight.yaw : 0.0, (int) ANIM_PERIOD);
 
         flight.tickCounter++;
         if (flight.tickCounter % 3 == 0) {
@@ -362,5 +371,7 @@ public final class DeliveryManager {
         long hoverEnd;
         long arrival;
         int tickCounter;
+        double yaw;
+        Location prevPos;
     }
 }

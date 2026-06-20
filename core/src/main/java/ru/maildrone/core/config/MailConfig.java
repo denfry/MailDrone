@@ -42,7 +42,10 @@ public final class MailConfig {
     // drone visuals
     private Material bodyMaterial;
     private Material rotorMaterial;
+    private Material noseMaterial;
     private double droneScale;
+    private int rotorCount;
+    private boolean faceTravel;
     private boolean particles;
     private boolean sounds;
 
@@ -80,7 +83,10 @@ public final class MailConfig {
 
         bodyMaterial = parseMaterial(c.getString("drone.body-material", "GRAY_CONCRETE"), Material.GRAY_CONCRETE);
         rotorMaterial = parseMaterial(c.getString("drone.rotor-material", "IRON_NUGGET"), Material.IRON_NUGGET);
+        noseMaterial = parseMaterial(c.getString("drone.nose-material", "REDSTONE_BLOCK"), Material.REDSTONE_BLOCK);
         droneScale = clampDouble(c.getDouble("drone.scale", 0.6), 0.1, 3.0);
+        rotorCount = clamp(c.getInt("drone.rotor-count", 4), 1, 8);
+        faceTravel = c.getBoolean("drone.face-travel", true);
         particles = c.getBoolean("drone.particles", true);
         sounds = c.getBoolean("drone.sounds", true);
 
@@ -180,6 +186,18 @@ public final class MailConfig {
 
     public double droneScale() {
         return droneScale;
+    }
+
+    public Material noseMaterial() {
+        return noseMaterial;
+    }
+
+    public int rotorCount() {
+        return rotorCount;
+    }
+
+    public boolean faceTravel() {
+        return faceTravel;
     }
 
     public boolean particles() {

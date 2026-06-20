@@ -9,8 +9,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.view.AnvilView;
 import ru.maildrone.core.MailDrone;
 import ru.maildrone.core.config.Messages;
+import ru.maildrone.core.gui.AnvilNamePrompt;
 import ru.maildrone.core.gui.MailboxMenu;
 import ru.maildrone.core.gui.PackingMenu;
 import ru.maildrone.core.parcel.Parcel;
@@ -34,7 +36,31 @@ public final class MenuListener implements Listener {
             handlePacking(event, pm);
         } else if (holder instanceof MailboxMenu mm) {
             handleMailbox(event, mm);
+        } else if (holder instanceof AnvilNamePrompt) {
+            handleAnvil(event);
         }
+    }
+
+    private void handleAnvil(InventoryClickEvent event) {
+        event.setCancelled(true);
+        if (event.getRawSlot() != AnvilNamePrompt.RESULT_SLOT) {
+            return;
+        }
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
+        String name = "";
+        if (event.getView() instanceof AnvilView anvil && anvil.getRenameText() != null) {
+            name = anvil.getRenameText().trim();
+        }
+        if (name.isBlank()) {
+            return;
+        }
+        final String target = name;
+        mail.schedulers().onEntity(player, () -> {
+            player.closeInventory();
+            mail.startSendFlow(player, target);
+        }, null);
     }
 
     private void handlePacking(InventoryClickEvent event, PackingMenu pm) {
@@ -135,7 +161,7 @@ public final class MenuListener implements Listener {
                     return;
                 }
             }
-        } else if (holder instanceof MailboxMenu) {
+        } else if (holder instanceof MailboxMenu || holder instanceof AnvilNamePrompt) {
             event.setCancelled(true);
         }
     }

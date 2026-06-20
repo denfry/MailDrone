@@ -1,6 +1,7 @@
 package ru.maildrone.core;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +14,7 @@ import ru.maildrone.core.config.Messages;
 import ru.maildrone.core.delivery.CostService;
 import ru.maildrone.core.delivery.DeliveryManager;
 import ru.maildrone.core.delivery.NotificationService;
+import ru.maildrone.core.gui.AnvilNamePrompt;
 import ru.maildrone.core.gui.MailboxMenu;
 import ru.maildrone.core.gui.PackingMenu;
 import ru.maildrone.core.listener.BlockListener;
@@ -156,6 +158,41 @@ public final class MailDrone {
         }
         MailboxMenu menu = new MailboxMenu(messages, incoming);
         schedulers.onEntity(player, () -> player.openInventory(menu.getInventory()), null);
+    }
+
+    /** Полный сценарий отправки: проверка получателя/отделения и открытие упаковки. */
+    public void startSendFlow(Player player, String targetName) {
+        UUID recipientId;
+        String recipientName;
+        Player online = Bukkit.getPlayerExact(targetName);
+        if (online != null) {
+            recipientId = online.getUniqueId();
+            recipientName = online.getName();
+        } else {
+            OfflinePlayer off = Bukkit.getOfflinePlayerIfCached(targetName);
+            if (off == null || off.getUniqueId() == null) {
+                player.sendMessage(messages.msg("player-not-found", Messages.ph("name", targetName)));
+                return;
+            }
+            recipientId = off.getUniqueId();
+            recipientName = off.getName() != null ? off.getName() : targetName;
+        }
+        if (recipientId.equals(player.getUniqueId())) {
+            player.sendMessage(messages.msg("cant-send-self"));
+            return;
+        }
+        if (config.requireOffice() && postPoints.hasOffices()
+                && !postPoints.hasOfficeNear(player.getLocation(), config.officeRadius())) {
+            player.sendMessage(messages.msg("need-office"));
+            return;
+        }
+        openPacking(player, recipientId, recipientName);
+    }
+
+    /** Открывает наковальню для ввода ника получателя (у блока-отделения). */
+    public void openRecipientPrompt(Player player) {
+        AnvilNamePrompt prompt = new AnvilNamePrompt(messages);
+        schedulers.onEntity(player, () -> player.openInventory(prompt.getInventory()), null);
     }
 
     public JavaPlugin plugin() {

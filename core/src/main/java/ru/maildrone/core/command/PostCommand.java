@@ -2,7 +2,6 @@ package ru.maildrone.core.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -64,32 +63,7 @@ public final class PostCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(mail.messages().msg("usage-send"));
             return;
         }
-        String name = args[1];
-        UUID recipientId;
-        String recipientName;
-        Player online = Bukkit.getPlayerExact(name);
-        if (online != null) {
-            recipientId = online.getUniqueId();
-            recipientName = online.getName();
-        } else {
-            OfflinePlayer off = Bukkit.getOfflinePlayerIfCached(name);
-            if (off == null || off.getUniqueId() == null) {
-                player.sendMessage(mail.messages().msg("player-not-found", Messages.ph("name", name)));
-                return;
-            }
-            recipientId = off.getUniqueId();
-            recipientName = off.getName() != null ? off.getName() : name;
-        }
-        if (recipientId.equals(player.getUniqueId())) {
-            player.sendMessage(mail.messages().msg("cant-send-self"));
-            return;
-        }
-        if (mail.config().requireOffice() && mail.postPoints().hasOffices()
-                && !mail.postPoints().hasOfficeNear(player.getLocation(), mail.config().officeRadius())) {
-            player.sendMessage(mail.messages().msg("need-office"));
-            return;
-        }
-        mail.openPacking(player, recipientId, recipientName);
+        mail.startSendFlow(player, args[1]);
     }
 
     private void doBox(CommandSender sender) {

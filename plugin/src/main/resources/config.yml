@@ -45,7 +45,10 @@ points:
 drone:
   body-material: GRAY_CONCRETE
   rotor-material: IRON_NUGGET
+  nose-material: REDSTONE_BLOCK
   scale: 0.6
+  rotor-count: 4          # число винтов (1–8)
+  face-travel: true       # дрон поворачивается по курсу полёта
   particles: true
   sounds: true
 

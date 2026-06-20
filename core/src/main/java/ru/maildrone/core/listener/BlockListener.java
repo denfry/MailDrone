@@ -37,6 +37,7 @@ public final class BlockListener implements Listener {
         } else if (mail.postPoints().isOffice(loc)) {
             event.setCancelled(true);
             player.sendMessage(mail.messages().msg("office-here"));
+            mail.openRecipientPrompt(player);
         }
     }
 }

@@ -151,6 +151,8 @@ public final class Messages {
 
         m.put("office-here", "<yellow>Почтовое отделение.</yellow> <gray>Используйте <white>/post send <ник></white>, чтобы отправить посылку.");
         m.put("postomat-here", "<yellow>Почтомат.</yellow> <gray>Открываю ваши посылки...");
+        m.put("anvil-title", "Кому отправить?");
+        m.put("anvil-input-name", "Введите ник получателя");
         return m;
     }
 }
