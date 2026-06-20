@@ -1,0 +1,24 @@
+name: MailDrone
+version: '${version}'
+main: ru.maildrone.plugin.MailDronePlugin
+api-version: '1.21'
+folia-supported: true
+description: Доставка Почты России дроном
+authors: [denfry]
+
+commands:
+  post:
+    description: Почта России — отправка и получение посылок
+    usage: /post help
+    aliases: [pochta, mail]
+
+permissions:
+  maildrone.use:
+    description: Базовое использование почты (почтомат, трекинг, список)
+    default: true
+  maildrone.send:
+    description: Отправка посылок
+    default: true
+  maildrone.admin:
+    description: Администрирование почты (отделения, почтоматы, reload)
+    default: op
