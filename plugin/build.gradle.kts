@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:26.1.2.build.72-stable")
     implementation(project(":core"))
     implementation(project(":v1_21"))
     implementation(project(":v26_1"))
