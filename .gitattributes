@@ -1,0 +1,13 @@
+# Скрипты и конфиги, которые исполняются на Linux-CI, всегда с LF,
+# иначе CRLF ломает запуск (gradlew) и парсинг workflow.
+gradlew         text eol=lf
+*.sh            text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+
+# Windows-скрипты — CRLF.
+*.bat           text eol=crlf
+gradlew.bat     text eol=crlf
+
+# Бинарники не трогаем.
+*.jar           binary

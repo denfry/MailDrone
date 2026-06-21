@@ -7,6 +7,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import ru.maildrone.core.config.Messages;
 import ru.maildrone.core.parcel.Parcel;
+import ru.maildrone.core.parcel.ParcelStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,11 +30,21 @@ public final class MailboxMenu implements InventoryHolder {
         this.inventory = Bukkit.createInventory(this, size, messages.get("box-title"));
         for (int i = 0; i < count; i++) {
             Parcel p = parcels.get(i);
-            ItemStack icon = GuiItems.icon(Material.PAPER,
-                    messages.get("box-icon-name", Messages.ph("tracking", p.tracking())),
-                    of(messages.get("box-icon-lore-from", Messages.ph("sender", p.senderName())),
-                            messages.get("box-icon-lore-items", Messages.ph("count", String.valueOf(p.itemCount()))),
-                            messages.get("box-icon-lore-take")));
+            ItemStack icon;
+            if (p.status() == ParcelStatus.RETURNED) {
+                // Возврат отправителю: получатель не забрал посылку.
+                icon = GuiItems.icon(Material.PAPER,
+                        messages.get("box-icon-name", Messages.ph("tracking", p.tracking())),
+                        of(messages.get("box-icon-lore-returned", Messages.ph("recipient", p.recipientName())),
+                                messages.get("box-icon-lore-items", Messages.ph("count", String.valueOf(p.itemCount()))),
+                                messages.get("box-icon-lore-take")));
+            } else {
+                icon = GuiItems.icon(Material.PAPER,
+                        messages.get("box-icon-name", Messages.ph("tracking", p.tracking())),
+                        of(messages.get("box-icon-lore-from", Messages.ph("sender", p.senderName())),
+                                messages.get("box-icon-lore-items", Messages.ph("count", String.valueOf(p.itemCount()))),
+                                messages.get("box-icon-lore-take")));
+            }
             inventory.setItem(i, icon);
             slotToTracking.put(i, p.tracking());
         }

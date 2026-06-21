@@ -119,10 +119,15 @@ public final class YamlParcelStore implements ParcelStore {
     }
 
     @Override
-    public List<Parcel> incomingFor(UUID recipient) {
+    public List<Parcel> incomingFor(UUID player) {
         List<Parcel> out = new ArrayList<>();
         for (Parcel p : parcels.values()) {
-            if (p.recipient().equals(recipient) && p.status() == ParcelStatus.ARRIVED && !p.collected()) {
+            if (p.collected()) {
+                continue;
+            }
+            boolean incoming = p.recipient().equals(player) && p.status() == ParcelStatus.ARRIVED;
+            boolean returned = p.sender().equals(player) && p.status() == ParcelStatus.RETURNED;
+            if (incoming || returned) {
                 out.add(p);
             }
         }

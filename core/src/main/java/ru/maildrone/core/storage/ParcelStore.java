@@ -31,8 +31,11 @@ public interface ParcelStore {
     /** Посылки, отправленные игроком. */
     List<Parcel> bySender(UUID sender);
 
-    /** Прибывшие, но не полученные посылки для игрока (для почтомата). */
-    List<Parcel> incomingFor(UUID recipient);
+    /**
+     * Посылки, доступные игроку в почтомате: прибывшие на его имя (ARRIVED) и
+     * возвращённые ему как отправителю (RETURNED), ещё не полученные.
+     */
+    List<Parcel> incomingFor(UUID player);
 
     /** Активные посылки игрока (как отправленные, так и входящие, нетерминальные). */
     List<Parcel> activeFor(UUID player);

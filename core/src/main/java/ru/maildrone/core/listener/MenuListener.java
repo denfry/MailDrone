@@ -101,21 +101,25 @@ public final class MenuListener implements Listener {
             player.sendMessage(mail.cost().cannotAffordMessage());
             return;
         }
-        // Снимок снят — забираем реальные предметы из меню СИНХРОННО (в этом же тике)
-        // и блокируем меню (submitted), чтобы предметы нельзя было вытащить до отправки.
+        // Блокируем меню и забираем предметы из него СИНХРОННО (мы уже на потоке игрока).
         pm.markSubmitted();
         pm.clearItemArea();
-        mail.schedulers().onEntity(player, () -> {
-            if (!mail.cost().charge(player)) {
+        if (!mail.cost().charge(player)) {
+            // Редкий случай: средства исчезли между проверкой и списанием. Возврат и
+            // закрытие — на следующем тике: менять инвентарь прямо в обработчике клика нежелательно.
+            mail.schedulers().onEntity(player, () -> {
                 returnItems(player, contents);
                 player.closeInventory();
                 player.sendMessage(mail.cost().cannotAffordMessage());
-                return;
-            }
-            player.closeInventory();
-            String tracking = mail.delivery().createAndSend(player, pm.recipient(), pm.recipientName(), contents);
-            player.sendMessage(mail.messages().msg("sent", Messages.ph("tracking", tracking)));
-        }, null);
+            }, null);
+            return;
+        }
+        // Успех: посылка создаётся и персистится СИНХРОННО — её содержимое уже в store,
+        // поэтому предметы не потеряются, даже если сервер выключится до закрытия меню.
+        // Внутри обработчика клика нельзя звать closeInventory — откладываем только его.
+        String tracking = mail.delivery().createAndSend(player, pm.recipient(), pm.recipientName(), contents);
+        player.sendMessage(mail.messages().msg("sent", Messages.ph("tracking", tracking)));
+        mail.schedulers().onEntity(player, player::closeInventory, null);
     }
 
     private void handleMailbox(InventoryClickEvent event, MailboxMenu mm) {
@@ -131,8 +135,12 @@ public final class MenuListener implements Listener {
         }
         Player player = (Player) event.getWhoClicked();
         Parcel parcel = mail.store().get(tracking);
-        if (parcel == null || parcel.status() != ParcelStatus.ARRIVED || parcel.collected()
-                || !parcel.recipient().equals(player.getUniqueId())) {
+        if (parcel == null || parcel.collected()) {
+            return;
+        }
+        boolean canTake = (parcel.status() == ParcelStatus.ARRIVED && parcel.recipient().equals(player.getUniqueId()))
+                || (parcel.status() == ParcelStatus.RETURNED && parcel.sender().equals(player.getUniqueId()));
+        if (!canTake) {
             return;
         }
         mail.schedulers().onEntity(player, () -> {

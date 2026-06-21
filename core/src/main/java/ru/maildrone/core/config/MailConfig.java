@@ -22,10 +22,8 @@ public final class MailConfig {
     private double sortingChance;
     private int sortingExtraMin;
     private int sortingExtraMax;
-    private int minFlightSeconds;
-    private int maxFlightSeconds;
-    private double droneSpeed;
     private double cruiseHeight;
+    private double defaultRouteDistance;
 
     // cost
     private CostType costType;
@@ -52,6 +50,7 @@ public final class MailConfig {
     private boolean notifyOnJoin;
     private boolean updateCheck;
     private int deliveredRetentionDays;
+    private int pickupTimeoutDays;
     private List<String> sortingNotes;
 
     public MailConfig(JavaPlugin plugin) {
@@ -68,10 +67,8 @@ public final class MailConfig {
         sortingChance = clamp01(c.getDouble("delivery.sorting-chance", 0.20));
         sortingExtraMin = c.getInt("delivery.sorting-extra-min-seconds", 20);
         sortingExtraMax = c.getInt("delivery.sorting-extra-max-seconds", 60);
-        minFlightSeconds = c.getInt("delivery.min-flight-seconds", 5);
-        maxFlightSeconds = c.getInt("delivery.max-flight-seconds", 25);
-        droneSpeed = Math.max(1.0, c.getDouble("delivery.drone-speed", 8.0));
         cruiseHeight = c.getDouble("delivery.cruise-height", 12.0);
+        defaultRouteDistance = Math.max(0.0, c.getDouble("delivery.default-route-distance", 24.0));
 
         costType = parseEnum(CostType.class, c.getString("cost.type", "XP_LEVELS"), CostType.XP_LEVELS);
         costAmount = Math.max(0, c.getInt("cost.amount", 1));
@@ -94,6 +91,7 @@ public final class MailConfig {
         notifyOnJoin = c.getBoolean("notify-on-join", true);
         updateCheck = c.getBoolean("update-check", true);
         deliveredRetentionDays = Math.max(0, c.getInt("storage.delivered-retention-days", 7));
+        pickupTimeoutDays = Math.max(0, c.getInt("storage.pickup-timeout-days", 14));
         sortingNotes = c.getStringList("delivery.sorting-notes");
         if (sortingNotes.isEmpty()) {
             sortingNotes = List.of(
@@ -111,9 +109,6 @@ public final class MailConfig {
         if (sortingExtraMax < sortingExtraMin) {
             sortingExtraMax = sortingExtraMin;
         }
-        if (maxFlightSeconds < minFlightSeconds) {
-            maxFlightSeconds = minFlightSeconds;
-        }
     }
 
     /** Случайная базовая задержка доставки (секунды) до прибытия. */
@@ -123,10 +118,6 @@ public final class MailConfig {
 
     public int randomSortingExtraSeconds() {
         return randomBetween(sortingExtraMin, sortingExtraMax);
-    }
-
-    public int randomFlightSeconds() {
-        return randomBetween(minFlightSeconds, maxFlightSeconds);
     }
 
     public String randomSortingNote() {
@@ -146,12 +137,12 @@ public final class MailConfig {
         return sortingChance;
     }
 
-    public double droneSpeed() {
-        return droneSpeed;
-    }
-
     public double cruiseHeight() {
         return cruiseHeight;
+    }
+
+    public double defaultRouteDistance() {
+        return defaultRouteDistance;
     }
 
     public CostType costType() {
@@ -220,6 +211,10 @@ public final class MailConfig {
 
     public int deliveredRetentionDays() {
         return deliveredRetentionDays;
+    }
+
+    public int pickupTimeoutDays() {
+        return pickupTimeoutDays;
     }
 
     // ---- helpers ----

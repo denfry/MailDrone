@@ -1,0 +1,41 @@
+name: 🐞 Баг
+description: Сообщить об ошибке в работе плагина
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Что произошло
+      description: Опишите проблему и что вы ожидали увидеть.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: server
+    attributes:
+      label: Ядро и версия сервера
+      placeholder: "Paper 1.21.11 / Folia 26.x / Purpur ..."
+    validations:
+      required: true
+  - type: input
+    id: plugin
+    attributes:
+      label: Версия MailDrone
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи / стектрейс
+      description: Вставьте релевантные строки из консоли (если есть).
+      render: text

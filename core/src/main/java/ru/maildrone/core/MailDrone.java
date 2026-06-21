@@ -88,6 +88,10 @@ public final class MailDrone {
         }
 
         delivery.resumeAll();
+        int returned = delivery.returnExpiredArrivals();
+        if (returned > 0) {
+            plugin.getLogger().info("Возвращено отправителям неполученных посылок: " + returned);
+        }
 
         if (config.updateCheck()) {
             new UpdateChecker(plugin, schedulers, "denfry/MailDrone").check();

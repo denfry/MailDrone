@@ -19,6 +19,7 @@ import ru.maildrone.core.storage.ParcelStore;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Управляет жизненным циклом посылки: приём → вылет дрона → (сортировка) →
@@ -260,7 +261,10 @@ public final class DeliveryManager {
 
     /** Выдаёт содержимое посылки игроку (для почтомата). Возвращает true при успехе. */
     public boolean collect(Player player, Parcel parcel) {
-        if (parcel.status() != ParcelStatus.ARRIVED || parcel.collected()) {
+        UUID id = player.getUniqueId();
+        boolean asRecipient = parcel.status() == ParcelStatus.ARRIVED && parcel.recipient().equals(id);
+        boolean asReturn = parcel.status() == ParcelStatus.RETURNED && parcel.sender().equals(id);
+        if ((!asRecipient && !asReturn) || parcel.collected()) {
             return false;
         }
         List<ItemStack> contents = parcel.contents();
@@ -280,12 +284,40 @@ public final class DeliveryManager {
         }
         parcel.contents().clear();
         parcel.collected(true);
-        setStatus(parcel, ParcelStatus.DELIVERED, "");
-        notifications.announceDelivered(parcel);
+        if (asRecipient) {
+            setStatus(parcel, ParcelStatus.DELIVERED, "");
+            notifications.announceDelivered(parcel);
+        } else {
+            // Возврат забрал сам отправитель — статус остаётся RETURNED (терминальный),
+            // фиксируем collected и время для ретеншна.
+            setStatus(parcel, ParcelStatus.RETURNED, "");
+        }
         if (overflow) {
             player.sendMessage(messages.msg("inventory-full"));
         }
         return true;
+    }
+
+    /**
+     * Возвращает отправителю посылки, которые слишком долго пролежали в почтомате
+     * неполученными. Возвращает число таких посылок. Вызывать при включении
+     * (после {@link #resumeAll()}).
+     */
+    public int returnExpiredArrivals() {
+        int days = config.pickupTimeoutDays();
+        if (days <= 0) {
+            return 0;
+        }
+        long cutoff = System.currentTimeMillis() - days * 86_400_000L;
+        int returned = 0;
+        for (Parcel p : store.all()) {
+            if (p.status() == ParcelStatus.ARRIVED && !p.collected() && p.updatedAt() < cutoff) {
+                setStatus(p, ParcelStatus.RETURNED, "");
+                notifications.announceReturned(p);
+                returned++;
+            }
+        }
+        return returned;
     }
 
     private void setStatus(Parcel parcel, ParcelStatus status, String note) {
@@ -315,7 +347,14 @@ public final class DeliveryManager {
                 return postomat;
             }
         }
-        return origin.clone();
+        // Почтоматы не настроены: чтобы полёт было видно (а не зависание на месте),
+        // отправляем дрон на заданное расстояние в случайном горизонтальном направлении.
+        double dist = config.defaultRouteDistance();
+        if (dist <= 0.0 || origin.getWorld() == null) {
+            return origin.clone();
+        }
+        double angle = ThreadLocalRandom.current().nextDouble(2.0 * Math.PI);
+        return origin.clone().add(Math.cos(angle) * dist, 0, Math.sin(angle) * dist);
     }
 
     private void safeParticle(Location loc, ParticleKind kind, int count,

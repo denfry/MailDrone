@@ -34,3 +34,4 @@ run/
 
 # Claude Code local state
 .claude/
+.github/modernize/

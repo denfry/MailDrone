@@ -108,6 +108,7 @@ public final class Messages {
         m.put("arrived-subtitle", "<white><tracking></white>");
         m.put("join-incoming", "<green>В почтомате вас ждут посылки: <white><count></white>. Откройте: <white>/post box</white>");
         m.put("sender-delivered", "<gray>Посылка <white><tracking></white> вручена получателю.");
+        m.put("returned-to-sender", "<yellow>Посылку <white><tracking></white> не забрал(а) <white><recipient></white> — она возвращена вам. Заберите: <white>/post box</white>");
 
         m.put("track-not-found", "<red>Посылка с номером <white><tracking></white> не найдена.");
         m.put("track-header", "<gold>━━━━━ Отслеживание <white><tracking></white> <gold>━━━━━");
@@ -127,6 +128,7 @@ public final class Messages {
         m.put("box-empty", "<gray>Для вас нет посылок в почтомате.");
         m.put("box-icon-name", "<white><tracking></white>");
         m.put("box-icon-lore-from", "<gray>От: <white><sender></white>");
+        m.put("box-icon-lore-returned", "<red>Возврат: <white><recipient></white> не забрал(а)");
         m.put("box-icon-lore-items", "<gray>Вложений: <white><count></white>");
         m.put("box-icon-lore-take", "<green>ЛКМ — забрать");
         m.put("collected", "<green>Посылка <white><tracking></white> получена!");

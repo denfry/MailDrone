@@ -27,6 +27,8 @@ public final class PostCommand implements CommandExecutor, TabCompleter {
     private static final String PERM_SEND = "maildrone.send";
     private static final String PERM_USE = "maildrone.use";
     private static final String PERM_ADMIN = "maildrone.admin";
+    /** Предел числа подсказок ника, чтобы не перебирать весь usercache. */
+    private static final int TAB_LIMIT = 50;
 
     private final MailDrone mail;
 
@@ -226,17 +228,28 @@ public final class PostCommand implements CommandExecutor, TabCompleter {
         if (args.length == 2) {
             String sub = args[0].toLowerCase(Locale.ROOT);
             if (sub.equals("send")) {
+                // Сначала онлайн-игроки. Офлайн-кэш (Bukkit.getOfflinePlayers()) на
+                // больших серверах огромен, поэтому добавляем из него только совпадения
+                // с уже введённым префиксом и ограничиваем общий размер подсказок.
+                String prefix = args[1].toLowerCase(Locale.ROOT);
                 List<String> names = new ArrayList<>();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    names.add(p.getName());
-                }
-                for (OfflinePlayer off : Bukkit.getOfflinePlayers()) {
-                    String n = off.getName();
-                    if (n != null && !names.contains(n)) {
-                        names.add(n);
+                    if (p.getName().toLowerCase(Locale.ROOT).startsWith(prefix)) {
+                        names.add(p.getName());
                     }
                 }
-                return filter(names, args[1]);
+                if (!prefix.isEmpty()) {
+                    for (OfflinePlayer off : Bukkit.getOfflinePlayers()) {
+                        if (names.size() >= TAB_LIMIT) {
+                            break;
+                        }
+                        String n = off.getName();
+                        if (n != null && n.toLowerCase(Locale.ROOT).startsWith(prefix) && !names.contains(n)) {
+                            names.add(n);
+                        }
+                    }
+                }
+                return names;
             }
             if (sub.equals("admin") && sender.hasPermission(PERM_ADMIN)) {
                 return filter(List.of("office", "postomat", "list", "reload"), args[1]);

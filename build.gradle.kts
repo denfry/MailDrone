@@ -1,12 +1,19 @@
 plugins {
-    java
+    // Корневой проект сам по себе ничего не собирает (нет исходников). Плагин java
+    // здесь НЕ применяем намеренно: иначе создавался бы пустой build/libs/
+    // MailDronePlugin-<версия>.jar (только манифест, без plugin.yml), который легко
+    // спутать с готовым плагином. Единственный рабочий jar — plugin/build/libs/
+    // MailDrone-<версия>.jar (shadowJar). java-library подключается в subprojects ниже.
     // Подключаем shadow, но применяем только в модуле plugin (сборка финального jar).
     id("com.gradleup.shadow") version "9.4.2" apply false
 }
 
 allprojects {
     group = "ru.maildrone"
-    version = "0.1.0"
+    // Версия берётся из gradle.properties (version=...), переопределяется в CI
+    // релиза тегом: ./gradlew build -Pversion=1.2.3. Так все модули и финальный
+    // jar (MailDrone-<версия>.jar) получают единую версию из тега.
+    version = rootProject.version
 }
 
 subprojects {

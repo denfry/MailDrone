@@ -88,6 +88,18 @@ public final class NotificationService {
                 messages.msg("sender-delivered", Messages.ph("tracking", parcel.tracking()))), null);
     }
 
+    /** Сообщает отправителю, что неполученная посылка вернулась к нему. */
+    public void announceReturned(Parcel parcel) {
+        Player s = Bukkit.getPlayer(parcel.sender());
+        if (s == null) {
+            return;
+        }
+        schedulers.onEntity(s, () -> s.sendMessage(
+                messages.msg("returned-to-sender",
+                        Messages.ph("tracking", parcel.tracking()),
+                        Messages.ph("recipient", parcel.recipientName()))), null);
+    }
+
     public void onJoin(Player player) {
         if (!config.notifyOnJoin()) {
             return;
