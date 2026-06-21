@@ -7,6 +7,11 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+    ignore:
+      # paper-api (бейзлайн) меняем вручную: проект намеренно компилируется против
+      # 1.21.x, чтобы один jar работал и на 1.21.x, и на 26.x. Бамп до 26.x ломает
+      # совместимость (см. build.gradle.kts и адаптеры v1_21/v26_1).
+      - dependency-name: "io.papermc.paper:paper-api"
 
   - package-ecosystem: github-actions
     directory: "/"
