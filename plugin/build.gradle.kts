@@ -11,7 +11,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":v1_21"))
     implementation(project(":v26_1"))
-    implementation("org.bstats:bstats-bukkit:3.1.0")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 }
 
 tasks.processResources {
