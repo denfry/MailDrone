@@ -5,7 +5,7 @@ plugins {
     // спутать с готовым плагином. Единственный рабочий jar — plugin/build/libs/
     // MailDrone-<версия>.jar (shadowJar). java-library подключается в subprojects ниже.
     // Подключаем shadow, но применяем только в модуле plugin (сборка финального jar).
-    id("com.gradleup.shadow") version "9.4.2" apply false
+    id("com.gradleup.shadow") version "9.4.3" apply false
 }
 
 allprojects {
